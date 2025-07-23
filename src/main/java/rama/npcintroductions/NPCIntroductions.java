@@ -1,5 +1,6 @@
 package rama.npcintroductions;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -16,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class NPCIntroductions extends JavaPlugin {
 
@@ -23,6 +26,7 @@ public final class NPCIntroductions extends JavaPlugin {
     private static File dataFile;
     private static FileConfiguration Data;
     public static BukkitTask talkTask;
+    private Boolean PaPiHook = false;
 
     @Override
     public void onEnable() {
@@ -45,10 +49,8 @@ public final class NPCIntroductions extends JavaPlugin {
         if(getServer().getPluginManager().getPlugin("Citizens") == null){
             sendLog("Citizens dependency not found!");
         }
-        if(getServer().getPluginManager().getPlugin("ServersNPC") != null){
-            sendLog("Enabling ZNPCS hook!");
-            Bukkit.getPluginManager().registerEvents(new ZNPCListener(), this);
-        }
+        initPaPi();
+
     }
 
     @Override
@@ -132,7 +134,12 @@ public final class NPCIntroductions extends JavaPlugin {
                     return;
                 }
 
-                String message = ChatColor.translateAlternateColorCodes('&', messages.get(counter)).replaceAll("%player%", p.getName());
+                String message = plugin.colorized(messages.get(counter)).replaceAll("%player%", p.getName());
+
+                if(plugin.getPaPiHook()){
+                    message = PlaceholderAPI.setPlaceholders(p, message);
+                }
+
                 p.sendMessage(message);
                 if(finalMessage_sound != null) {
                     p.playSound(p.getLocation(), finalMessage_sound, 100, message_sound_pitch);
@@ -193,5 +200,35 @@ public final class NPCIntroductions extends JavaPlugin {
         }else{
             sendLog("&eUnrecognized action type for introduction "+i);
         }
+    }
+
+    private void initPaPi(){
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
+            sendLog("&aDetected PlaceholderAPI, enabling hook!");
+            PaPiHook = true;
+        }
+    }
+
+    public Boolean getPaPiHook() {
+        return PaPiHook;
+    }
+
+    public String colorized(String s) {
+        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+        Matcher matcher = pattern.matcher(s);
+        while (matcher.find()) {
+            String hexCode = s.substring(matcher.start(), matcher.end());
+            String replaceSharp = hexCode.replace('#', 'x');
+
+            char[] ch = replaceSharp.toCharArray();
+            StringBuilder builder = new StringBuilder();
+            for (char c : ch) {
+                builder.append("&").append(c);
+            }
+
+            s = s.replace(hexCode, builder.toString());
+            matcher = pattern.matcher(s);
+        }
+        return ChatColor.translateAlternateColorCodes('&', s);
     }
 }

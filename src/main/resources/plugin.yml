@@ -1,7 +1,7 @@
 name: NPCIntroductions
 version: '${project.version}'
 main: rama.npcintroductions.NPCIntroductions
-soft-depend: [ Citizens , ServersNPC]
+soft-depend: [ Citizens , PlaceHolderAPI]
 authors: [ ImRama ]
 description: First click messages for your NPCS
 commands:

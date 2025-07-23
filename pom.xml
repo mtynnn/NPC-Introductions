@@ -6,7 +6,7 @@
 
     <groupId>rama.npcintroductions</groupId>
     <artifactId>NPCIntroductions</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
 
     <name>NPCIntroductions</name>
@@ -66,6 +66,10 @@
             <id>everything</id>
             <url>https://repo.citizensnpcs.co/</url>
         </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -83,9 +87,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.github.znetworkw.znpcservers</groupId>
-            <artifactId>znpcservers</artifactId>
-            <version>3.6</version>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
