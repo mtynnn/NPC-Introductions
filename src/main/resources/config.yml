@@ -23,7 +23,7 @@ introductions:
     first-time: true #Should the introduction be displayed only the first time they click the NPC?
     talk-type: man-talk #NONE to disable
     action:
-      command: "menu"
+      command: ["menu", "help"]
       type: PLAYER #CONSOLE/PLAYER
       sound: BLOCK_LEVER_CLICK #NONE to disable
       sound-pitch: 1

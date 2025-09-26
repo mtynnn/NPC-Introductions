@@ -15,6 +15,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -88,7 +89,12 @@ public final class NPCIntroductions extends JavaPlugin {
         //variables
         String talk_type = config.getString("introductions."+i+".talk-type");
             //action
-            String action_command = config.getString("introductions."+i+".action.command").replaceAll("%player%", p.getName());
+            List<String> action_commands = config.getStringList("introductions."+i+".action.command");
+            List<String> action_commands_replaced = new ArrayList<>();
+                for(String s : action_commands){
+                    action_commands_replaced.add(s.replaceAll("%player%", p.getName()));
+                }
+
             String action_type = config.getString("introductions."+i+".action.type");
             String action_sound_name = config.getString("introductions."+i+".action.sound");
             Sound action_sound = null;
@@ -114,7 +120,7 @@ public final class NPCIntroductions extends JavaPlugin {
         //variables
 
         if(playerAlreadyClicked && firstTime){
-            executeAction(action_type, p, action_command, action_sound, action_sound_pitch, i);
+            executeAction(action_type, p, action_commands_replaced, action_sound, action_sound_pitch, i);
             return;
         }
 
@@ -130,7 +136,7 @@ public final class NPCIntroductions extends JavaPlugin {
             public void run() {
                 if (counter >= messages.size()) {
                     cancel();
-                    executeAction(action_type, p, action_command, finalAction_sound, action_sound_pitch, i);
+                    executeAction(action_type, p, action_commands, finalAction_sound, action_sound_pitch, i);
                     return;
                 }
 
@@ -186,14 +192,18 @@ public final class NPCIntroductions extends JavaPlugin {
             }
         }.runTaskTimerAsynchronously(plugin, 0, (long) interval);
     }
-    public static void executeAction(String action_type, Player p, String action_command, Sound action_sound, long action_sound_pitch, int i){
-        if(action_type.equalsIgnoreCase("PLAYER") && action_command != null && !action_command.isEmpty()){
-            p.performCommand(action_command);
+    public static void executeAction(String action_type, Player p, List<String> action_commands, Sound action_sound, long action_sound_pitch, int i){
+        if(action_type.equalsIgnoreCase("PLAYER") && action_commands != null && !action_commands.isEmpty()){
+            for(String command : action_commands) {
+                p.performCommand(command);
+            }
             if(action_sound != null){
                 p.playSound(p.getLocation(), action_sound, 100, action_sound_pitch);
             }
-        }else if(action_type.equalsIgnoreCase("CONSOLE") && action_command != null && !action_command.isEmpty()){
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), action_command);
+        }else if(action_type.equalsIgnoreCase("CONSOLE") && action_commands != null && !action_commands.isEmpty()){
+            for(String command : action_commands) {
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+            }
             if(action_sound != null){
                 p.playSound(p.getLocation(), action_sound, 100, action_sound_pitch);
             }
