@@ -136,7 +136,7 @@ public final class NPCIntroductions extends JavaPlugin {
             public void run() {
                 if (counter >= messages.size()) {
                     cancel();
-                    executeAction(action_type, p, action_commands, finalAction_sound, action_sound_pitch, i);
+                    executeAction(action_type, p, action_commands_replaced, finalAction_sound, action_sound_pitch, i);
                     return;
                 }
 
@@ -195,14 +195,24 @@ public final class NPCIntroductions extends JavaPlugin {
     public static void executeAction(String action_type, Player p, List<String> action_commands, Sound action_sound, long action_sound_pitch, int i){
         if(action_type.equalsIgnoreCase("PLAYER") && action_commands != null && !action_commands.isEmpty()){
             for(String command : action_commands) {
-                p.performCommand(command);
+                String processedCommand = command;
+                // Apply PlaceholderAPI if available
+                if(plugin.getPaPiHook()){
+                    processedCommand = PlaceholderAPI.setPlaceholders(p, processedCommand);
+                }
+                p.performCommand(processedCommand);
             }
             if(action_sound != null){
                 p.playSound(p.getLocation(), action_sound, 100, action_sound_pitch);
             }
         }else if(action_type.equalsIgnoreCase("CONSOLE") && action_commands != null && !action_commands.isEmpty()){
             for(String command : action_commands) {
-                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+                String processedCommand = command;
+                // Apply PlaceholderAPI if available
+                if(plugin.getPaPiHook()){
+                    processedCommand = PlaceholderAPI.setPlaceholders(p, processedCommand);
+                }
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), processedCommand);
             }
             if(action_sound != null){
                 p.playSound(p.getLocation(), action_sound, 100, action_sound_pitch);
